@@ -2,6 +2,7 @@ package cache
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/yerlan-tleubekov/go-redis/internal/models"
@@ -12,23 +13,24 @@ type TokenCache interface {
 	Get(key string) *models.UserToken
 }
 
-func (cache *redisCache) Set(key string, value *models.UserToken) {
+func (cache *RedisCache) Set(key string, value string) error {
 	client := cache.getClient()
 
-	json, err := json.Marshal(value)
+	// json, err := json.Marshal(value)
 
+	status := client.Set(cache.ctx, key, value, cache.expires*time.Second)
+	_, err := status.Result()
 	if err != nil {
-		panic(err)
+		return errors.New("Cant write user from db")
 	}
-
-	client.Set(key, json, cache.expires*time.Second)
+	return nil
 
 }
 
-func (cache *redisCache) Get(key string) *models.UserToken {
+func (cache *RedisCache) Get(key string) *models.UserToken {
 	client := cache.getClient()
 
-	val, err := client.Get(key).Result()
+	val, err := client.Get(cache.ctx, key).Result()
 
 	if err != nil {
 		return nil
@@ -36,7 +38,7 @@ func (cache *redisCache) Get(key string) *models.UserToken {
 
 	userToken := models.UserToken{}
 
-	err := json.Unmarshal([]byte(val), &userToken)
+	err = json.Unmarshal([]byte(val), &userToken)
 
 	if err != nil {
 		return nil

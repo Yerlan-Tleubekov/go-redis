@@ -1,7 +1,8 @@
 package service
 
 import (
-	"fmt"
+	"errors"
+	"net/http"
 
 	"github.com/yerlan-tleubekov/go-redis/internal/models"
 	"github.com/yerlan-tleubekov/go-redis/pkg/jwt"
@@ -16,11 +17,16 @@ func (service *Service) SignUp(user *models.User) {
 
 }
 
-func (service *Service) SignIn(userID int) {
+func (service *Service) SignIn(userID int) (string, error, int) {
+
 	token, err := jwt.CreateToken(uint64(userID))
 	if err != nil {
-		return
+		return "", errors.New("Server error"), http.StatusInternalServerError
 	}
 
-	fmt.Println(token)
+	if err = service.repository.SignIn(userID, token); err != nil {
+		return "", err, http.StatusInternalServerError
+	}
+
+	return token, nil, http.StatusOK
 }

@@ -1,5 +1,9 @@
 package models
 
+type UserIndent struct {
+	UserID int `json:"userID"`
+}
+
 type User struct {
 	UserID   int    `json:"userID"`
 	Login    string `json:"login"`

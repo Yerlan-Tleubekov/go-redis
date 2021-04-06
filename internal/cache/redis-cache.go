@@ -1,31 +1,32 @@
 package cache
 
 import (
-	"encoding/json"
+	"context"
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/yerlan-tleubekov/go-redis/internal/models"
 )
 
 type RedisCache struct {
 	host    string
 	db      int
 	expires time.Duration
+	ctx     context.Context
 }
 
-func NewRedisCache(host string, db int, exp time.Duration) *RedisCache {
+func NewRedisCache(ctx context.Context, host string, db int, exp time.Duration) *RedisCache {
 	return &RedisCache{
 		host:    host,
 		db:      db,
 		expires: exp,
+		ctx:     ctx,
 	}
 }
 
-func (cache *redisCache) getClient() *redis.Client {
-	return &redis.NewClient(&redis.Options{
-		Addr: cache.host,
-		Password: '',
-		DB: cache.db
+func (cache *RedisCache) getClient() *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Addr:     cache.host,
+		Password: "",
+		DB:       cache.db,
 	})
 }
