@@ -9,11 +9,11 @@ import (
 )
 
 type TokenCache interface {
-	Set(key string, value *models.UserToken)
-	Get(key string) *models.UserToken
+	SetToken(key string, value *models.UserToken)
+	GetToken(key string) *models.UserToken
 }
 
-func (cache *RedisCache) Set(key string, value string) error {
+func (cache *RedisCache) SetToken(key string, value string) error {
 	client := cache.getClient()
 
 	// json, err := json.Marshal(value)
@@ -27,7 +27,7 @@ func (cache *RedisCache) Set(key string, value string) error {
 
 }
 
-func (cache *RedisCache) Get(key string) *models.UserToken {
+func (cache *RedisCache) GetToken(key string) *models.UserToken {
 	client := cache.getClient()
 
 	val, err := client.Get(cache.ctx, key).Result()

@@ -13,6 +13,8 @@ func ErrorJSONCreator(err error) AnswerJSON {
 }
 
 func ErrorJsonWriter(err error, code int, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+
 	errorJSON := ErrorJSONCreator(err)
 	answerJSON := AnswerJSON{Data: errorJSON, Code: http.StatusBadRequest}
 	WriteResponse(w, code, answerJSON)

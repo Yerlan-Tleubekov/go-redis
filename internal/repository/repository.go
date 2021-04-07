@@ -1,11 +1,8 @@
 package repository
 
-import "github.com/yerlan-tleubekov/go-redis/internal/cache"
-
-type Authorization interface {
-	SignIn(int, string) error
-	SignUp()
-}
+import (
+	"github.com/yerlan-tleubekov/go-redis/internal/cache"
+)
 
 type Repository struct {
 	db       int

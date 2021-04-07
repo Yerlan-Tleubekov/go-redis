@@ -9,12 +9,7 @@ import (
 	"github.com/yerlan-tleubekov/go-redis/pkg/response"
 
 	"github.com/yerlan-tleubekov/go-redis/internal/models"
-	// "github.com/yerlan-tleubekov/go-redis/internal/cache"
 )
-
-// var (
-// tokenCache cache.TokenCache
-// )
 
 func (handler *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("it works")
@@ -22,9 +17,7 @@ func (handler *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 func (handler *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 
-	var userIdent models.UserIndent = models.UserIndent{}
-
-	w.Header().Set("Content-Type", "application/json")
+	var userValid models.UserValidation = models.UserValidation{}
 
 	body, err := ioutil.ReadAll(r.Body)
 
@@ -33,23 +26,28 @@ func (handler *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.Unmarshal(body, &userIdent)
+	err = json.Unmarshal(body, &userValid)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println(userIdent.UserID)
+	user, code, err := handler.services.GetUser(userValid.Login)
 
-	token, err, code := handler.services.SignIn(userIdent.UserID)
+	if err != nil {
+		response.WriteResponse(w, code, err)
+		return
+	}
+
+	token, err, code := handler.services.SignIn(user.UserID)
 	if err != nil {
 		response.ErrorJsonWriter(err, code, w)
 		return
 	}
 
 	userToken := response.Token{UserToken: token}
-	answerJSON := response.AnswerJSON{Data: userToken}
+	answerJSON := response.AnswerJSON{Data: userToken, Code: code}
 	response.WriteResponse(w, code, answerJSON)
 
 }

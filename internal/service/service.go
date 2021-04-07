@@ -4,10 +4,6 @@ import (
 	"github.com/yerlan-tleubekov/go-redis/internal/repository"
 )
 
-type IService interface {
-	Authenticator
-}
-
 type Service struct {
 	repository *repository.Repository
 }

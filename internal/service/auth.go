@@ -9,12 +9,17 @@ import (
 )
 
 type Authenticator interface {
-	SignUp(user *models.User)
+	SignUp(user *models.User) error
 	SignIn(userID int)
 }
 
-func (service *Service) SignUp(user *models.User) {
+func (service *Service) SignUp(user *models.User) error {
 
+	if err := service.repository.CreateUser(user); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (service *Service) SignIn(userID int) (string, error, int) {
